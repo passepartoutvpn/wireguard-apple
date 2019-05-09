@@ -100,8 +100,24 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
 
     func applicationShouldTerminateAfterLastWindowClosed(_ application: NSApplication) -> Bool {
-        application.setActivationPolicy(.accessory)
+        AppDelegate.setAppAppearsInDock(false)
         return false
+    }
+}
+
+extension AppDelegate {
+    static func setAppAppearsInDock(_ enabled: Bool) {
+        if enabled {
+            if NSApp.activationPolicy() != .regular {
+                // It looks like we need to go from deactivated to activated with policy as .regular
+                // for our app's main menu to show up.
+                NSApp.deactivate()
+                NSApp.setActivationPolicy(.regular)
+            }
+            NSApp.activate(ignoringOtherApps: true)
+        } else {
+            NSApp.setActivationPolicy(.accessory)
+        }
     }
 }
 

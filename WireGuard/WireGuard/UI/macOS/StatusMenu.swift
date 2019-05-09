@@ -151,15 +151,13 @@ class StatusMenu: NSMenu {
     }
 
     @objc func manageTunnelsClicked() {
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
+        AppDelegate.setAppAppearsInDock(true)
         guard let manageTunnelsWindow = windowDelegate?.manageTunnelsWindow() else { return }
         manageTunnelsWindow.makeKeyAndOrderFront(self)
     }
 
     @objc func importTunnelsClicked() {
-        NSApp.setActivationPolicy(.regular)
-        NSApp.activate(ignoringOtherApps: true)
+        AppDelegate.setAppAppearsInDock(true)
         guard let manageTunnelsWindow = windowDelegate?.manageTunnelsWindow() else { return }
         manageTunnelsWindow.makeKeyAndOrderFront(self)
         ImportPanelPresenter.presentImportPanel(tunnelsManager: tunnelsManager, sourceVC: manageTunnelsWindow.contentViewController)
