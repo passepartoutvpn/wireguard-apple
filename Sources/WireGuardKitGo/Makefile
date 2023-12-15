@@ -24,6 +24,8 @@ GOARCH_x86_64 := amd64
 GOOS_macosx := $(if $(IS_CATALYST),ios,darwin)
 GOOS_iphoneos := ios
 GOOS_iphonesimulator := ios
+GOOS_appletvos := ios
+GOOS_appletvsimulator := ios
 
 TARGET ?= $(if $(IS_CATALYST),-target arm64-apple-ios14.0-macabi,)
 

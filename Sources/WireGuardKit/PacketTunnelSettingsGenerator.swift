@@ -47,6 +47,33 @@ class PacketTunnelSettingsGenerator {
         if let listenPort = tunnelConfiguration.interface.listenPort {
             wgSettings.append("listen_port=\(listenPort)\n")
         }
+        if let Jc = tunnelConfiguration.interface.Jc {
+                    wgSettings.append("jc=\(Jc)\n")
+                }
+                if let Jmin = tunnelConfiguration.interface.Jmin {
+                    wgSettings.append("jmin=\(Jmin)\n")
+                }
+                if let Jmax = tunnelConfiguration.interface.Jmax {
+                    wgSettings.append("jmax=\(Jmax)\n")
+                }
+                if let S1 = tunnelConfiguration.interface.S1 {
+                    wgSettings.append("s1=\(S1)\n")
+                }
+                if let S2 = tunnelConfiguration.interface.S2 {
+                    wgSettings.append("s2=\(S2)\n")
+                }
+                if let H1 = tunnelConfiguration.interface.H1 {
+                    wgSettings.append("h1=\(H1)\n")
+                }
+                if let H2 = tunnelConfiguration.interface.H2 {
+                    wgSettings.append("h2=\(H2)\n")
+                }
+                if let H3 = tunnelConfiguration.interface.H3 {
+                    wgSettings.append("h3=\(H3)\n")
+                }
+                if let H4 = tunnelConfiguration.interface.H4 {
+                    wgSettings.append("h4=\(H4)\n")
+                }
         if !tunnelConfiguration.peers.isEmpty {
             wgSettings.append("replace_peers=true\n")
         }
@@ -116,7 +143,7 @@ class PacketTunnelSettingsGenerator {
          * add a nob, maybe, or iOS will do probing for us.
          */
         if mtu == 0 {
-            #if os(iOS)
+            #if os(iOS) || os(tvOS)
             networkSettings.mtu = NSNumber(value: 1280)
             #elseif os(macOS)
             networkSettings.tunnelOverheadBytes = 80
@@ -129,13 +156,16 @@ class PacketTunnelSettingsGenerator {
 
         let (ipv4Addresses, ipv6Addresses) = addresses()
         let (ipv4IncludedRoutes, ipv6IncludedRoutes) = includedRoutes()
+        let (ipv4ExcludedRoutes, ipv6ExcludedRoutes) = excludedRoutes()
 
         let ipv4Settings = NEIPv4Settings(addresses: ipv4Addresses.map { $0.destinationAddress }, subnetMasks: ipv4Addresses.map { $0.destinationSubnetMask })
         ipv4Settings.includedRoutes = ipv4IncludedRoutes
+        ipv4Settings.excludedRoutes = ipv4ExcludedRoutes
         networkSettings.ipv4Settings = ipv4Settings
 
         let ipv6Settings = NEIPv6Settings(addresses: ipv6Addresses.map { $0.destinationAddress }, networkPrefixLengths: ipv6Addresses.map { $0.destinationNetworkPrefixLength })
         ipv6Settings.includedRoutes = ipv6IncludedRoutes
+        ipv6Settings.excludedRoutes = ipv6ExcludedRoutes
         networkSettings.ipv6Settings = ipv6Settings
 
         return networkSettings
@@ -186,6 +216,33 @@ class PacketTunnelSettingsGenerator {
         }
         return (ipv4IncludedRoutes, ipv6IncludedRoutes)
     }
+    private func excludedRoutes() -> ([NEIPv4Route], [NEIPv6Route]) {
+            var ipv4ExcludedRoutes = [NEIPv4Route]()
+            var ipv6ExcludedRoutes = [NEIPv6Route]()
+            for endpoint in resolvedEndpoints {
+                guard let endpoint = endpoint else { continue }
+                switch endpoint.host {
+                case .ipv4(let address):
+                    ipv4ExcludedRoutes.append(NEIPv4Route(destinationAddress: "\(address)", subnetMask: "255.255.255.255"))
+                case .ipv6(let address):
+                    ipv6ExcludedRoutes.append(NEIPv6Route(destinationAddress: "\(address)", networkPrefixLength: NSNumber(value: UInt8(128))))
+                default:
+                    fatalError()
+                }
+            }
+
+            for peer in tunnelConfiguration.peers {
+                for addressRange in peer.excludeIPs {
+                    if addressRange.address is IPv4Address {
+                        ipv4ExcludedRoutes.append(NEIPv4Route(destinationAddress: "\(addressRange.address)", subnetMask: "\(addressRange.subnetMask())"))
+                    } else if addressRange.address is IPv6Address {
+                        ipv6ExcludedRoutes.append(NEIPv6Route(destinationAddress: "\(addressRange.address)", networkPrefixLength: NSNumber(value: addressRange.networkPrefixLength)))
+                    }
+                }
+            }
+
+            return (ipv4ExcludedRoutes, ipv6ExcludedRoutes)
+        }
 
     private class func reresolveEndpoint(endpoint: Endpoint) -> EndpointResolutionResult {
         return Result { (endpoint, try endpoint.withReresolvedIP()) }

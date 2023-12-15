@@ -13,7 +13,15 @@ public struct InterfaceConfiguration {
     public var dnsSearch = [String]()
     public var dnsHTTPSURL: URL?
     public var dnsTLSServerName: String?
-
+    public var Jc: UInt16?
+    public var Jmin: UInt16?
+    public var Jmax: UInt16?
+    public var S1: UInt16?
+    public var S2: UInt16?
+    public var H1: UInt32?
+    public var H2: UInt32?
+    public var H3: UInt32?
+    public var H4: UInt32?
     public init(privateKey: PrivateKey) {
         self.privateKey = privateKey
     }
