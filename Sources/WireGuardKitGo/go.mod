@@ -1,4 +1,4 @@
-dule github.com/amnezia-vpn/amneziawg-apple
+module github.com/amnezia-vpn/amneziawg-apple
 
 go 1.16
 
