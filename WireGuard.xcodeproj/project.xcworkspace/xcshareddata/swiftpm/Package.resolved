@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "wg-go-apple",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/passepartoutvpn/wg-go-apple/",
+      "state" : {
+        "revision" : "6fa26e5edb91220b0f0d60c8378ae53359a64250",
+        "version" : "0.0.20240326"
+      }
+    }
+  ],
+  "version" : 2
+}

@@ -8,7 +8,7 @@ import os
 class PacketTunnelProvider: NEPacketTunnelProvider {
 
     private lazy var adapter: WireGuardAdapter = {
-        return WireGuardAdapter(with: self) { logLevel, message in
+        return WireGuardAdapter(with: self, backend: WireGuardBackendGo()) { logLevel, message in
             wg_log(logLevel.osLogLevel, message: message)
         }
     }()

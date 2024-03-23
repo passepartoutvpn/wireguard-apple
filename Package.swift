@@ -11,13 +11,21 @@ let package = Package(
         .tvOS(.v17)
     ],
     products: [
-        .library(name: "WireGuardKit", targets: ["WireGuardKit"])
+        .library(
+            name: "WireGuardKit",
+            targets: [
+                "WireGuardKit",
+                "WireGuardKitGo"
+            ]
+        )
     ],
-    dependencies: [],
+    dependencies: [
+        .package(url: "https://github.com/passepartoutvpn/wg-go-apple", from: "0.0.20240326")
+    ],
     targets: [
         .target(
             name: "WireGuardKit",
-            dependencies: ["WireGuardKitGo", "WireGuardKitC"]
+            dependencies: ["WireGuardKitC"]
         ),
         .target(
             name: "WireGuardKitC",
@@ -26,16 +34,10 @@ let package = Package(
         ),
         .target(
             name: "WireGuardKitGo",
-            dependencies: [],
-            exclude: [
-                "goruntime-boottime-over-monotonic.diff",
-                "go.mod",
-                "go.sum",
-                "api-apple.go",
-                "Makefile"
-            ],
-            publicHeadersPath: ".",
-            linkerSettings: [.linkedLibrary("wg-go")]
+            dependencies: [
+                "WireGuardKit",
+                "wg-go-apple"
+            ]
         )
     ]
 )

@@ -194,8 +194,7 @@ extension AppDelegate {
             appVersion += " (\(appBuild))"
         }
         let appVersionString = [
-            tr(format: "macAppVersion (%@)", appVersion),
-            tr(format: "macGoBackendVersion (%@)", WIREGUARD_GO_VERSION)
+            tr(format: "macAppVersion (%@)", appVersion)
         ].joined(separator: "\n")
         NSApp.activate(ignoringOtherApps: true)
         NSApp.orderFrontStandardAboutPanel(options: [
