@@ -106,6 +106,19 @@ class PacketTunnelProvider: NEPacketTunnelProvider {
     }
 }
 
+extension PacketTunnelProvider: WireGuardAdapterDelegate {
+    public func adapterShouldReassert(_ adapter: WireGuardAdapter, reasserting: Bool) {
+        self.reasserting = reasserting
+    }
+
+    public func adapterShouldSetNetworkSettings(_ adapter: WireGuardAdapter, settings: Any?, completionHandler: ((Error?) -> Void)?) {
+        guard let settings = settings as? NEPacketTunnelNetworkSettings else {
+            return
+        }
+        setTunnelNetworkSettings(settings, completionHandler: completionHandler)
+    }
+}
+
 extension WireGuardLogLevel {
     var osLogLevel: OSLogType {
         switch self {

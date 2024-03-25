@@ -43,8 +43,8 @@ public class WireGuardAdapter {
     /// Network routes monitor.
     private var networkMonitor: NWPathMonitor?
 
-    /// Packet tunnel provider.
-    private weak var packetTunnelProvider: NEPacketTunnelProvider?
+    /// Adapter delegate.
+    private weak var delegate: WireGuardAdapterDelegate?
 
     /// Log handler closure.
     private let logHandler: LogHandler
@@ -125,12 +125,12 @@ public class WireGuardAdapter {
     // MARK: - Initialization
 
     /// Designated initializer.
-    /// - Parameter packetTunnelProvider: an instance of `NEPacketTunnelProvider`. Internally stored
+    /// - Parameter delegate: an instance of `WireGuardAdapterDelegate`. Internally stored
     ///   as a weak reference.
     /// - Parameter backend: a backend implementation.
     /// - Parameter logHandler: a log handler closure.
-    public init(with packetTunnelProvider: NEPacketTunnelProvider, backend: WireGuardBackend, logHandler: @escaping LogHandler) {
-        self.packetTunnelProvider = packetTunnelProvider
+    public init(with delegate: WireGuardAdapterDelegate, backend: WireGuardBackend, logHandler: @escaping LogHandler) {
+        self.delegate = delegate
         self.backend = backend
         self.logHandler = logHandler
 
@@ -248,9 +248,9 @@ public class WireGuardAdapter {
             // Tell the system that the tunnel is going to reconnect using new WireGuard
             // configuration.
             // This will broadcast the `NEVPNStatusDidChange` notification to the GUI process.
-            self.packetTunnelProvider?.reasserting = true
+            self.delegate?.adapterShouldReassert(self, reasserting: true)
             defer {
-                self.packetTunnelProvider?.reasserting = false
+                self.delegate?.adapterShouldReassert(self, reasserting: false)
             }
 
             do {
@@ -319,7 +319,7 @@ public class WireGuardAdapter {
         condition.lock()
         defer { condition.unlock() }
 
-        self.packetTunnelProvider?.setTunnelNetworkSettings(networkSettings) { error in
+        self.delegate?.adapterShouldSetNetworkSettings(self, settings: networkSettings) { error in
             systemError = error
             condition.signal()
         }
