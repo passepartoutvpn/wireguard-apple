@@ -37,6 +37,12 @@ private enum State {
     case temporaryShutdown(_ settingsGenerator: PacketTunnelSettingsGenerator)
 }
 
+public protocol WireGuardAdapterDelegate: AnyObject {
+    func adapterShouldReassert(_ adapter: WireGuardAdapter, reasserting: Bool)
+
+    func adapterShouldSetNetworkSettings(_ adapter: WireGuardAdapter, settings: NEPacketTunnelNetworkSettings, completionHandler: ((Error?) -> Void)?)
+}
+
 public class WireGuardAdapter {
     public typealias LogHandler = (WireGuardLogLevel, String) -> Void
 
